@@ -1,5 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using EventsManagement.Infrastructure.Persistence;
+using EventsManagement.Infrastructure;
+using EventsManagement.Application;
+using EventsManagement.Application.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,15 +11,43 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddSwaggerGen();
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.Position));
 
-builder.Services.AddDbContext<EventsDbContext>(options =>
+builder.Services.AddSwaggerGen(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), options =>
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        options.EnableRetryOnFailure();
+        Description = "JWT Authorization header using the Bearer scheme.",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
     });
 });
+
+builder.Services.AddApplication(new JwtSettings
+{
+    Issuer = builder.Configuration["JwtSettings:Issuer"],
+    Audience = builder.Configuration["JwtSettings:Audience"],
+    SecurityKey = builder.Configuration["JwtSettings:SecurityKey"]
+});
+
+builder.Services.AddPersistence(builder.Configuration);
 
 var app = builder.Build();
 
@@ -32,6 +64,10 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
