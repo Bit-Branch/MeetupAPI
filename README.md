@@ -1,5 +1,18 @@
 # MeetupAPI
 
+CRUD Web API for managing meetups. Using CQRS pattern, JWT Bearer authentication.
+
+## Used technologies:
+
+- .NET 6
+- EF Core 6
+- MS SQL
+- AutoMapper 11
+- BCrypt.Net-Next 4
+- Fluent Validation 11
+- MediatR 10
+- Swagger + SwaggerUI (Swashbuckle 6)
+
 ## How to launch
 
 1. Clone repository:
