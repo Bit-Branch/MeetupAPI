@@ -1,6 +1,6 @@
 # MeetupAPI
 
-CRUD Web API for managing meetups. Using CQRS pattern, JWT Bearer authentication.
+CRUD Web API for managing meetups (CQRS, JWT Bearer authentication).
 
 ## Used technologies:
 
